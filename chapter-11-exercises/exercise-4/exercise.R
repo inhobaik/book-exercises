@@ -3,8 +3,8 @@
 # Install the `"nycflights13"` package. Load (`library()`) the package.
 # You'll also need to load `dplyr`
 library("dplyr")
-install.packages("nycflight13")
-library("nycflight13")
+install.packages("nycflights13")
+library("nycflights13")
 
 # The data frame `flights` should now be accessible to you.
 # Use functions to inspect it: how many rows and columns does it have?
@@ -26,14 +26,14 @@ flights <- arrange(flights, -delayed_in_air) # - infront means descending order
 
 # For practice, repeat the last 2 steps in a single statement using the pipe
 # operator. You can clear your environmental variables to "reset" the data frame
-
+flights <- filghts %>%  mutate(gain_in_air = arr_delay - dep_delay) %>% arrange(gain_in_air)
 
 # Make a histogram of the amount of time gained using the `hist()` function
-
+hist(flights$gain_in_air)
 
 # On average, did flights gain or lose time?
 # Note: use the `na.rm = TRUE` argument to remove NA values from your aggregation
-summarize(flights, avg = mean(delayed_in_air, na.rm = TRUE))
+mean(flights$gain_in_air, na.rm = TRUE)
 
 # Create a data.frame of flights headed to SeaTac ('SEA'), only including the
 # origin, destination, and the "gain_in_air" column you just created
@@ -43,15 +43,20 @@ flights %>%
   summarize(avg_delayed = mean(delayed_in_air, na.rm = TRUE)) %>% 
   pull(avg_delayed)
 
-
-to_sea <- filter(flights, dest == "SEA")
-to_sea <- select(to_sea, origin, destination, delayed_in_air)
-View(to_sea)
+to_sea <- flights %>%  
+  select(origin, dest, gain_in_air) %>% 
+  filter(desk == "SEA")
 
 # On average, did flights to SeaTac gain or loose time?
 summarize(to_sea, avg_delayed = mean(delayed_in_air, na.rm = TRUE))
 
+mean(to_sea$gain_in_air, na.rm = TRUE)
+
 # Consider flights from JFK to SEA. What was the average, min, and max air time
 # of those flights? Bonus: use pipes to answer this question in one statement
 # (without showing any other data)!
-
+filter(flights, origin == "JFK", dest == "SEA") %>% 
+  summarize(avg_air_time = mean(air_time, na.rm=TRUE),
+            max_air_time = max(air_time, na.rm = TRUE),
+            min_air_time = min(air_time, na.rm = TRUE)
+            )
